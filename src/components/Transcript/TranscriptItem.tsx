@@ -19,16 +19,16 @@ const TranscriptItem = memo(
         <div
           ref={ref}
           onClick={() => onSentenceClick(index)}
-          className={`px-4 py-3 cursor-pointer rounded-lg transition-all duration-200 border ${
+          className={`px-4 py-3 cursor-pointer rounded-md transition-all duration-200 border ${
             isActive
               ? 'bg-amber-500/10 border-amber-500/30 shadow-lg shadow-amber-500/5'
-              : 'bg-transparent border-transparent hover:bg-zinc-800/50'
+              : 'bg-transparent border-transparent hover:bg-hovered'
           }`}
         >
           {(subtitleMode === 'bilingual' || subtitleMode === 'en') && (
             <p
               className={`text-base leading-relaxed ${
-                isActive ? 'text-white font-medium' : 'text-zinc-200'
+                isActive ? 'text-ink font-medium' : 'text-ink'
               }`}
             >
               <ClickableWord
@@ -44,17 +44,17 @@ const TranscriptItem = memo(
               {zh ? (
                 <p
                   className={`text-sm leading-relaxed ${
-                    isActive ? 'text-amber-300/90' : 'text-zinc-400'
+                    isActive ? 'text-amber-300/90' : 'text-ink-soft'
                   }`}
                 >
                   {zh}
                 </p>
               ) : subtitleMode === 'zh' ? (
                 <div>
-                  <p className="text-base text-zinc-300 leading-relaxed">
+                  <p className="text-base text-ink-soft leading-relaxed">
                     <ClickableWord sentence={en} isActiveSentence={false} />
                   </p>
-                  <span className="text-xs text-zinc-500 italic mt-0.5 block">
+                  <span className="text-xs text-ink-mute italic mt-0.5 block">
                     (暂无中文字幕)
                   </span>
                 </div>
@@ -63,7 +63,7 @@ const TranscriptItem = memo(
           )}
 
           {subtitleMode === 'blurred' && (
-            <p className="text-base blurred-text text-zinc-300">{en}</p>
+            <p className="text-base blurred-text text-ink-soft">{en}</p>
           )}
         </div>
       );

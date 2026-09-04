@@ -57,7 +57,7 @@ function TranscriptList({
 
   if (!sentences.length) {
     return (
-      <div className="flex items-center justify-center h-full text-zinc-500 text-sm">
+      <div className="flex items-center justify-center h-full text-ink-mute text-sm">
         <p>Load a YouTube video to see subtitles here.</p>
       </div>
     );

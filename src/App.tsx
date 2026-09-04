@@ -736,8 +736,8 @@ export default function App() {
                 onClick={() => shadowing.setSubtitleMode(mode)}
                 className={`px-3 py-1 text-xs rounded-full transition-colors ${
                   shadowing.subtitleMode === mode
-                    ? 'bg-zinc-100/10 text-zinc-100 border border-zinc-100/25'
-                    : 'bg-zinc-800 text-zinc-500 border border-zinc-700 hover:text-zinc-300'
+                    ? 'is-active border'
+                    : 'bg-hovered text-ink-mute border border-line-strong hover:text-ink-soft'
                 }`}
               >
                 {label}
@@ -747,8 +747,8 @@ export default function App() {
 
           {/* Translation progress bar */}
           {progress.status === 'translating' && (
-            <div className="mt-3 p-3 bg-zinc-100/5 border border-zinc-100/15 rounded-lg">
-              <div className="flex items-center justify-between text-xs text-zinc-300 mb-2">
+            <div className="mt-3 p-3 is-active border rounded-md">
+              <div className="flex items-center justify-between text-xs text-ink-soft mb-2">
                 <span className="flex items-center gap-1.5">
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   DeepSeek AI 智能精翻中... {percent}% ({progress.completed}/
@@ -756,13 +756,13 @@ export default function App() {
                 </span>
                 <button
                   onClick={cancelTranslation}
-                  className="p-0.5 text-zinc-500 hover:text-zinc-100"
+                  className="p-0.5 text-ink-mute hover:text-ink"
                   title="中断翻译"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
-              <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-hovered rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-zinc-400 to-zinc-100 rounded-full transition-all duration-500"
                   style={{ width: `${percent}%` }}
@@ -772,7 +772,7 @@ export default function App() {
           )}
 
           {progress.status === 'error' && progress.errorMessage && (
-            <div className="mt-3 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-sm text-red-400">
+            <div className="mt-3 p-3 bg-red-500/10 border border-red-500/30 rounded-md text-sm text-red-400">
               {progress.errorMessage}
             </div>
           )}
@@ -785,7 +785,7 @@ export default function App() {
                   currentVideoIdRef.current &&
                   startTranslation(currentVideoIdRef.current, sentences)
                 }
-                className="mt-3 flex items-center gap-2 px-4 py-2.5 bg-zinc-100 hover:bg-white text-zinc-900 rounded-lg text-sm font-medium transition-colors"
+                className="mt-3 flex items-center gap-2 px-4 py-2.5 btn-primary rounded-md text-sm font-medium transition-colors"
               >
                 <Sparkles className="w-4 h-4" />
                 AI 翻译这个视频（{sentences.length} 句）
@@ -793,7 +793,7 @@ export default function App() {
             ) : (
               <button
                 onClick={() => setSettingsSection('ai')}
-                className="mt-3 flex items-center gap-2 px-4 py-2.5 bg-zinc-100/10 hover:bg-zinc-100/15 border border-zinc-100/25 text-zinc-100 rounded-lg text-sm transition-colors"
+                className="mt-3 flex items-center gap-2 px-4 py-2.5 is-active border text-ink rounded-md text-sm transition-colors"
               >
                 <Sparkles className="w-4 h-4" />
                 配置 AI 翻译
@@ -802,14 +802,14 @@ export default function App() {
           )}
 
           {error && (
-            <div className="mt-3 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-sm text-red-400">
+            <div className="mt-3 p-3 bg-red-500/10 border border-red-500/30 rounded-md text-sm text-red-400">
               {error}
             </div>
           )}
 
           {loading && (
-            <div className="mt-3 flex items-center gap-2 text-sm text-zinc-400">
-              <div className="w-4 h-4 border-2 border-zinc-100 border-t-transparent rounded-full animate-spin" />
+            <div className="mt-3 flex items-center gap-2 text-sm text-ink-soft">
+              <div className="w-4 h-4 border-2 border-ink border-t-transparent rounded-full animate-spin" />
               Loading subtitles...
             </div>
           )}
@@ -818,10 +818,10 @@ export default function App() {
           {sentences.length > 0 && (
             <button
               onClick={handleToggleBookshelf}
-              className={`mt-4 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border transition-colors ${
+              className={`mt-4 flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium border transition-colors ${
                 isBookshelved
-                  ? 'bg-zinc-100/10 text-zinc-100 border-zinc-100/25 hover:bg-zinc-100/15'
-                  : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:text-zinc-100 hover:border-zinc-100/30'
+                  ? 'is-active'
+                  : 'bg-hovered text-ink-soft border-line-strong hover:text-ink hover:border-line-strong'
               }`}
             >
               {isBookshelved ? (
@@ -844,27 +844,27 @@ export default function App() {
           onMouseDown={startDrag}
           onDoubleClick={() => setLeftWidth(50)}
           className={`hidden lg:block w-1.5 shrink-0 cursor-col-resize transition-colors relative group ${
-            isDragging ? 'bg-zinc-100' : 'bg-zinc-800 hover:bg-zinc-100/50'
+            isDragging ? 'bg-ink' : 'bg-hovered hover:bg-line-strong'
           }`}
           title="拖动调整面板宽度，双击复位"
         >
           <div className="absolute inset-y-0 -left-2 -right-2" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-8 rounded-full bg-zinc-600 group-hover:bg-zinc-100/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="w-0.5 h-3.5 bg-zinc-900 rounded-full" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-8 rounded-full bg-line-strong group-hover:bg-ink flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="w-0.5 h-3.5 bg-raised rounded-full" />
           </div>
         </div>
 
         {/* Right panel: Transcript */}
-        <div className="hidden lg:flex lg:w-[calc(100%-var(--left-w))] flex-col bg-zinc-950">
-          <div className="px-4 py-2 border-b border-zinc-800 flex items-center">
-            <h2 className="text-sm font-medium text-zinc-400">
+        <div className="hidden lg:flex lg:w-[calc(100%-var(--left-w))] flex-col bg-base">
+          <div className="px-4 py-2 border-b border-line flex items-center">
+            <h2 className="text-sm font-medium text-ink-soft">
               Transcript
               {sentences.length > 0 && (
-                <span className="ml-2 text-zinc-600">({sentences.length} sentences)</span>
+                <span className="ml-2 text-ink-mute">({sentences.length} sentences)</span>
               )}
             </h2>
             {progress.status === 'translating' && (
-              <span className="ml-auto text-xs text-zinc-400">
+              <span className="ml-auto text-xs text-ink-soft">
                 ✨ {percent}%
               </span>
             )}

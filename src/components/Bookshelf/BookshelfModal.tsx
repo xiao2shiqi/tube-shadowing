@@ -46,14 +46,14 @@ export default function BookshelfModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-[100] p-4"
+      className="fixed inset-0 overlay flex items-center justify-center z-[100] p-4"
       onClick={onClose}
     >
       <div
-        className="bg-zinc-900 border border-zinc-700 rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden"
+        className="bg-raised border border-line-strong rounded-xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-line">
           <div className="flex items-center gap-1">
             {([
               ['bookshelf', '精读书架', items.length],
@@ -65,10 +65,10 @@ export default function BookshelfModal({
                   setTab(id);
                   setConfirmDeleteId(null);
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors ${
                   tab === id
-                    ? 'bg-zinc-800 text-zinc-100'
-                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
+                    ? 'bg-hovered text-ink'
+                    : 'text-ink-soft hover:text-ink hover:bg-hovered'
                 }`}
               >
                 {id === 'bookshelf' ? (
@@ -77,13 +77,13 @@ export default function BookshelfModal({
                   <Sparkles className="w-4 h-4" />
                 )}
                 {label}
-                <span className="text-zinc-500">({count})</span>
+                <span className="text-ink-mute">({count})</span>
               </button>
             ))}
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-zinc-400 hover:text-white rounded-lg"
+            className="p-1.5 text-ink-soft hover:text-ink rounded-md"
           >
             <X className="w-5 h-5" />
           </button>
@@ -91,7 +91,7 @@ export default function BookshelfModal({
 
         <div className={`flex-1 overflow-y-auto p-6 ${tab === 'bookshelf' ? '' : 'hidden'}`}>
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
+            <div className="flex flex-col items-center justify-center py-16 text-ink-mute">
               <BookOpen className="w-12 h-12 mb-3 stroke-[1.5]" />
               <p className="text-sm">
                 书架空空如也，在上方输入 YouTube 链接开始精听研读吧！
@@ -110,10 +110,10 @@ export default function BookshelfModal({
                       onSelectVideo(item.videoId, item.lastPlayedTime);
                       onClose();
                     }}
-                    className={`group relative bg-zinc-800/80 hover:bg-zinc-800 border rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-xl hover:border-zinc-100/30 flex flex-col ${
+                    className={`group relative bg-hovered hover:bg-hovered border rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-xl hover:border-line-strong flex flex-col ${
                       isCurrent
-                        ? 'border-zinc-100/60 ring-1 ring-zinc-100/30'
-                        : 'border-zinc-700/60'
+                        ? 'border-line-strong ring-1 ring-line-strong'
+                        : 'border-line-strong/60'
                     }`}
                   >
                     <div className="relative aspect-video bg-black overflow-hidden">
@@ -124,13 +124,13 @@ export default function BookshelfModal({
                         loading="lazy"
                       />
                       <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                        <div className="w-10 h-10 rounded-full bg-zinc-100 text-zinc-900 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                        <div className="w-10 h-10 rounded-full bg-btn text-btn-fg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
                           <Play className="w-5 h-5 fill-current ml-0.5" />
                         </div>
                       </div>
                       <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/60">
                         <div
-                          className="h-full bg-zinc-100"
+                          className="h-full bg-btn"
                           style={{ width: `${item.progressPercent}%` }}
                         />
                       </div>
@@ -138,13 +138,13 @@ export default function BookshelfModal({
 
                     <div className="p-3.5 flex-1 flex flex-col justify-between">
                       <div>
-                        <h3 className="text-sm font-medium text-zinc-200 line-clamp-2 leading-snug group-hover:text-zinc-100 transition-colors">
+                        <h3 className="text-sm font-medium text-ink line-clamp-2 leading-snug group-hover:text-ink transition-colors">
                           {item.title}
                         </h3>
-                        <div className="flex items-center gap-2 mt-2 text-xs text-zinc-400">
+                        <div className="flex items-center gap-2 mt-2 text-xs text-ink-soft">
                           <span>{item.sentenceCount} 句字幕</span>
                           {item.hasTranslation && (
-                            <span className="flex items-center gap-0.5 text-zinc-300 bg-zinc-100/10 px-1.5 py-0.5 rounded">
+                            <span className="flex items-center gap-0.5 text-ink-soft bg-hovered px-1.5 py-0.5 rounded">
                               <Sparkles className="w-3 h-3" /> 已精翻
                             </span>
                           )}
@@ -152,8 +152,8 @@ export default function BookshelfModal({
                       </div>
 
                       {isConfirmingDelete ? (
-                        <div className="flex items-center justify-between gap-2 mt-3 pt-2.5 border-t border-zinc-700/50 text-xs">
-                          <span className="text-zinc-400 leading-snug">
+                        <div className="flex items-center justify-between gap-2 mt-3 pt-2.5 border-t border-line-strong/50 text-xs">
+                          <span className="text-ink-soft leading-snug">
                             仅移除本机记录与缓存，全站共享的双语字幕不受影响
                           </span>
                           <div className="flex items-center gap-2 shrink-0">
@@ -172,16 +172,16 @@ export default function BookshelfModal({
                                 e.stopPropagation();
                                 setConfirmDeleteId(null);
                               }}
-                              className="px-2 py-1 rounded text-zinc-400 hover:text-zinc-200 transition-colors"
+                              className="px-2 py-1 rounded text-ink-soft hover:text-ink transition-colors"
                             >
                               取消
                             </button>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-zinc-700/50 text-xs text-zinc-500">
+                        <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-line-strong/50 text-xs text-ink-mute">
                           <span className="flex items-center gap-1">
-                            <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                            <Clock className="w-3.5 h-3.5 text-ink-soft" />
                             上次看到: {formatTime(item.lastPlayedTime)} (
                             {item.progressPercent}%)
                           </span>
@@ -207,13 +207,13 @@ export default function BookshelfModal({
 
         <div className={`flex-1 overflow-y-auto p-6 ${tab === 'translations' ? '' : 'hidden'}`}>
           {translations.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
+            <div className="flex flex-col items-center justify-center py-16 text-ink-mute">
               <Sparkles className="w-12 h-12 mb-3 stroke-[1.5]" />
               <p className="text-sm">还没有翻译记录。打开视频后点「AI 翻译」即可。</p>
             </div>
           ) : (
             <>
-              <p className="text-xs text-zinc-500 mb-4">
+              <p className="text-xs text-ink-mute mb-4">
                 你亲自翻译过的视频。字幕本身已存入全站共享缓存，删除记录不影响字幕。
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -228,10 +228,10 @@ export default function BookshelfModal({
                         onSelectVideo(item.videoId, 0);
                         onClose();
                       }}
-                      className={`group relative bg-zinc-800/80 hover:bg-zinc-800 border rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-xl hover:border-zinc-100/30 flex flex-col ${
+                      className={`group relative bg-hovered hover:bg-hovered border rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-xl hover:border-line-strong flex flex-col ${
                         isCurrent
-                          ? 'border-zinc-100/60 ring-1 ring-zinc-100/30'
-                          : 'border-zinc-700/60'
+                          ? 'border-line-strong ring-1 ring-line-strong'
+                          : 'border-line-strong/60'
                       }`}
                     >
                       <div className="relative aspect-video bg-black overflow-hidden">
@@ -242,7 +242,7 @@ export default function BookshelfModal({
                           loading="lazy"
                         />
                         <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                          <div className="w-10 h-10 rounded-full bg-zinc-100 text-zinc-900 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                          <div className="w-10 h-10 rounded-full bg-btn text-btn-fg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
                             <Play className="w-5 h-5 fill-current ml-0.5" />
                           </div>
                         </div>
@@ -250,20 +250,20 @@ export default function BookshelfModal({
 
                       <div className="p-3.5 flex-1 flex flex-col justify-between">
                         <div>
-                          <h3 className="text-sm font-medium text-zinc-200 line-clamp-2 leading-snug group-hover:text-zinc-100 transition-colors">
+                          <h3 className="text-sm font-medium text-ink line-clamp-2 leading-snug group-hover:text-ink transition-colors">
                             {item.title}
                           </h3>
-                          <div className="flex items-center gap-2 mt-2 text-xs text-zinc-400">
+                          <div className="flex items-center gap-2 mt-2 text-xs text-ink-soft">
                             <span>{item.sentenceCount} 句字幕</span>
-                            <span className="flex items-center gap-0.5 text-zinc-300 bg-zinc-100/10 px-1.5 py-0.5 rounded">
+                            <span className="flex items-center gap-0.5 text-ink-soft bg-hovered px-1.5 py-0.5 rounded">
                               <Sparkles className="w-3 h-3" /> 已精翻
                             </span>
                           </div>
                         </div>
 
                         {isConfirmingDelete ? (
-                          <div className="flex items-center justify-between gap-2 mt-3 pt-2.5 border-t border-zinc-700/50 text-xs">
-                            <span className="text-zinc-400 leading-snug">
+                          <div className="flex items-center justify-between gap-2 mt-3 pt-2.5 border-t border-line-strong/50 text-xs">
+                            <span className="text-ink-soft leading-snug">
                               仅删除这条记录，字幕仍在全站缓存中
                             </span>
                             <div className="flex items-center gap-2 shrink-0">
@@ -282,16 +282,16 @@ export default function BookshelfModal({
                                   e.stopPropagation();
                                   setConfirmDeleteId(null);
                                 }}
-                                className="px-2 py-1 rounded text-zinc-400 hover:text-zinc-200 transition-colors"
+                                className="px-2 py-1 rounded text-ink-soft hover:text-ink transition-colors"
                               >
                                 取消
                               </button>
                             </div>
                           </div>
                         ) : (
-                          <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-zinc-700/50 text-xs text-zinc-500">
+                          <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-line-strong/50 text-xs text-ink-mute">
                             <span className="flex items-center gap-1">
-                              <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                              <Clock className="w-3.5 h-3.5 text-ink-soft" />
                               翻译于 {formatDate(item.translatedAt)}
                             </span>
                             <button

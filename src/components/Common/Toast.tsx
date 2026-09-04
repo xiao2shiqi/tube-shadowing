@@ -18,7 +18,7 @@ export default function Toast({ message, onDone }: ToastProps) {
 
   return (
     <div
-      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-zinc-800 border border-zinc-600 text-sm text-zinc-200 rounded-lg shadow-lg transition-opacity duration-200 ${
+      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-hovered border border-line-strong text-sm text-ink rounded-md shadow-lg transition-opacity duration-200 ${
         visible ? 'opacity-100' : 'opacity-0'
       }`}
     >

@@ -21,30 +21,30 @@ const SHORTCUTS = [
 export default function KeyboardShortcutsModal({ onClose }: KeyboardShortcutsModalProps) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center overlay"
       onClick={onClose}
     >
       <div
-        className="bg-zinc-900 border border-zinc-700 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl"
+        className="bg-raised border border-line-strong rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-zinc-100">Keyboard Shortcuts</h2>
-          <button onClick={onClose} className="p-1 text-zinc-400 hover:text-white transition-colors">
+          <h2 className="text-lg font-semibold text-ink">Keyboard Shortcuts</h2>
+          <button onClick={onClose} className="p-1 text-ink-soft hover:text-ink transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
         <div className="space-y-2">
           {SHORTCUTS.map(({ key, desc }) => (
             <div key={key} className="flex items-center justify-between py-1">
-              <span className="text-sm text-zinc-400">{desc}</span>
-              <kbd className="px-2 py-0.5 text-xs font-mono bg-zinc-800 text-zinc-300 border border-zinc-600 rounded">
+              <span className="text-sm text-ink-soft">{desc}</span>
+              <kbd className="px-2 py-0.5 text-xs font-mono bg-hovered text-ink-soft border border-line-strong rounded">
                 {key}
               </kbd>
             </div>
           ))}
         </div>
-        <p className="mt-4 text-xs text-zinc-500">
+        <p className="mt-4 text-xs text-ink-mute">
           Click any English word to look it up in Eudic (macOS only).
         </p>
       </div>

@@ -70,7 +70,7 @@ export default function AITranslationSection({
 
   return (
     <div className="space-y-4">
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-ink-mute">
         选中哪家就用哪家翻译字幕。各家的 Key 分别保存，随时切换不用重填。
       </p>
 
@@ -87,8 +87,8 @@ export default function AITranslationSection({
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full border transition-colors ${
                 activeTab === p
-                  ? 'bg-zinc-100/10 text-zinc-100 border-zinc-100/25'
-                  : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:text-zinc-200'
+                  ? 'is-active'
+                  : 'bg-hovered text-ink-soft border-line-strong hover:text-ink'
               }`}
             >
               {AI_PROVIDER_PRESETS[p].label}
@@ -99,45 +99,45 @@ export default function AITranslationSection({
       </div>
 
       {!syncEnabled && (
-        <p className="text-xs text-zinc-500 bg-zinc-800/60 border border-zinc-700 rounded-lg px-3 py-2">
+        <p className="text-xs text-ink-mute bg-hovered/60 border border-line-strong rounded-md px-3 py-2">
           登录后 API Key 会加密保存到云端，换设备也能直接用；未登录时仅保存在本机浏览器。
         </p>
       )}
 
       <div>
-        <label className="block text-xs font-medium text-zinc-400 mb-1.5">API Key</label>
+        <label className="block text-xs font-medium text-ink-soft mb-1.5">API Key</label>
         <div className="relative">
           <input
             type={showKey ? 'text' : 'password'}
             value={current.apiKey}
             onChange={(e) => updateCurrent({ apiKey: e.target.value })}
             placeholder="sk-..."
-            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 pr-10 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-zinc-500"
+            className="w-full bg-hovered border border-line-strong rounded-md px-3 py-2 pr-10 text-sm text-ink placeholder-ink-mute outline-none focus:border-line-strong"
           />
           <button
             type="button"
             onClick={() => setShowKey(!showKey)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-zinc-500 hover:text-zinc-300"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-ink-mute hover:text-ink-soft"
           >
             {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
-        <p className="mt-1 text-xs text-zinc-600">{preset.keyHint}</p>
+        <p className="mt-1 text-xs text-ink-mute">{preset.keyHint}</p>
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-zinc-400 mb-1.5">Base URL</label>
+        <label className="block text-xs font-medium text-ink-soft mb-1.5">Base URL</label>
         <input
           type="text"
           value={current.baseUrl}
           onChange={(e) => updateCurrent({ baseUrl: e.target.value })}
           placeholder={preset.baseUrl}
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-zinc-500"
+          className="w-full bg-hovered border border-line-strong rounded-md px-3 py-2 text-sm text-ink placeholder-ink-mute outline-none focus:border-line-strong"
         />
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-zinc-400 mb-1.5">模型</label>
+        <label className="block text-xs font-medium text-ink-soft mb-1.5">模型</label>
         {/* Free text with suggestions — providers rename models often, so a
             locked dropdown would go stale and block a working model id. */}
         <input
@@ -146,7 +146,7 @@ export default function AITranslationSection({
           value={current.model}
           onChange={(e) => updateCurrent({ model: e.target.value })}
           placeholder={preset.model}
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-zinc-500"
+          className="w-full bg-hovered border border-line-strong rounded-md px-3 py-2 text-sm text-ink placeholder-ink-mute outline-none focus:border-line-strong"
         />
         <datalist id={`models-${activeTab}`}>
           {preset.models.map((m) => (
@@ -159,7 +159,7 @@ export default function AITranslationSection({
 
       {testResult && (
         <div
-          className={`flex items-start gap-2 p-3 rounded-lg text-xs ${
+          className={`flex items-start gap-2 p-3 rounded-md text-xs ${
             testResult.ok
               ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/60'
               : 'bg-red-950/80 text-red-300 border border-red-800/60'
@@ -178,20 +178,20 @@ export default function AITranslationSection({
         <button
           onClick={handleTest}
           disabled={testing}
-          className="flex items-center gap-1.5 px-3 py-2 text-sm text-zinc-300 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-lg transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 px-3 py-2 text-sm text-ink-soft bg-hovered hover:bg-hovered border border-line-strong rounded-md transition-colors disabled:opacity-50"
         >
           {testing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
           {testing ? '测试中...' : '测试连接'}
         </button>
         <div className="flex-1" />
         {syncing && (
-          <span className="text-xs text-zinc-500 flex items-center gap-1">
+          <span className="text-xs text-ink-mute flex items-center gap-1">
             <Loader2 className="w-3 h-3 animate-spin" /> 同步中
           </span>
         )}
         <button
           onClick={handleSave}
-          className="px-4 py-2 text-sm font-medium bg-zinc-100 hover:bg-white text-zinc-900 rounded-lg transition-colors"
+          className="px-4 py-2 text-sm font-medium btn-primary rounded-md transition-colors"
         >
           保存
         </button>

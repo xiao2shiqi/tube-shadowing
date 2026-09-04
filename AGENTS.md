@@ -61,3 +61,16 @@ Antigravity (Gemini) 在完成沟通后，直接在对话框输出符合以下�
 1. 负责具体文件修改（`types`、`worker`、`components` 等）。
 2. 执行 `npm run build` 确保无编译报错。
 3. 验证端到端功能闭环后交付用户。
+
+## 设计规范（强制）
+
+本项目的视觉规范见仓库根目录 `BRAND.md`，改任何界面前先读它。要点：
+
+- **主题**：必须支持浅色 / 深色 / 跟随系统三种，选择存 `localStorage` 的 `xiao27-theme` 键。
+- **配色**：黑白灰占九成；彩色只做小面积、有含义的点缀（琥珀=进行中，绿=完成，红=错误），
+  不做大面积填充，不用彩色做主按钮。
+- **禁止写死颜色**：组件里不许出现 `bg-zinc-900`、`text-white`、`#09090b` 这类固定色值，
+  一律用语义类（`bg-base`、`bg-raised`、`text-ink`、`border-line`、`.btn-primary` 等），
+  否则主题切换不生效。例外见 BRAND.md。
+- **圆角只有三档**：`rounded-md` / `rounded-xl` / `rounded-full`。
+- `BRAND.md` 与 `brand.css` 的真源在 xiao27-hub，本地不要直接改，用 `npm run sync:brand` 同步。

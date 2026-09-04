@@ -23,8 +23,8 @@ export default function ShadowingControls({
         onClick={onToggleLoop}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
           isLooping
-            ? 'bg-zinc-100/10 text-zinc-100 border border-zinc-100/25'
-            : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:text-zinc-200'
+            ? 'is-active border'
+            : 'bg-hovered text-ink-soft border border-line-strong hover:text-ink'
         }`}
         title="A-B Loop (L)"
       >
@@ -36,8 +36,8 @@ export default function ShadowingControls({
         onClick={onToggleAutoPause}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
           isAutoPause
-            ? 'bg-zinc-100/10 text-zinc-100 border border-zinc-100/25'
-            : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:text-zinc-200'
+            ? 'is-active border'
+            : 'bg-hovered text-ink-soft border border-line-strong hover:text-ink'
         }`}
         title="Auto-pause at sentence end (P)"
       >
@@ -46,20 +46,20 @@ export default function ShadowingControls({
       </button>
 
       <div className="flex items-center gap-1 ml-auto">
-        <Gauge className="w-4 h-4 text-zinc-400" />
+        <Gauge className="w-4 h-4 text-ink-soft" />
         <button
           onClick={() => onSpeedChange(-0.1)}
-          className="px-2 py-1 text-sm bg-zinc-800 border border-zinc-700 rounded text-zinc-300 hover:text-white transition-colors"
+          className="px-2 py-1 text-sm bg-hovered border border-line-strong rounded text-ink-soft hover:text-ink transition-colors"
           title="Slow down ([)"
         >
           -
         </button>
-        <span className="px-2 py-1 text-sm font-mono text-zinc-300 min-w-[3rem] text-center">
+        <span className="px-2 py-1 text-sm font-mono text-ink-soft min-w-[3rem] text-center">
           {playbackRate.toFixed(1)}x
         </span>
         <button
           onClick={() => onSpeedChange(0.1)}
-          className="px-2 py-1 text-sm bg-zinc-800 border border-zinc-700 rounded text-zinc-300 hover:text-white transition-colors"
+          className="px-2 py-1 text-sm bg-hovered border border-line-strong rounded text-ink-soft hover:text-ink transition-colors"
           title="Speed up (])"
         >
           +

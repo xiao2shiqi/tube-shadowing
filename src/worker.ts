@@ -115,6 +115,10 @@ interface CuratedFeedSource {
   type: 'channel' | 'playlist';
   category: FeedCategory;
   defaultLevel?: 'A2' | 'B1' | 'B2' | 'C1';
+  /** Keep only entries whose title contains this (case-insensitive). */
+  titleInclude?: string;
+  /** Drop entries whose title contains any of these (case-insensitive). */
+  titleExclude?: string[];
 }
 
 interface FeedVideoItem {
@@ -132,7 +136,21 @@ interface FeedVideoItem {
 }
 
 const CURATED_SOURCES: CuratedFeedSource[] = [
-  // 🎯 英语学习：BBC 6 Minute English 官方系列课
+  // 🎯 英语学习：BBC 6 Minute English — two feeds, merged and de-duplicated.
+  //
+  // The channel feed is current but only carries ~15 recent uploads of every
+  // kind (2 of them episodes); the playlist feed has the back catalogue but
+  // lags by days. Neither alone is enough: channel gives freshness, playlist
+  // gives depth. The title filter strips the channel's shorts/live/news items.
+  {
+    id: 'UCHaHD477h-FeBbVh9Sh7syA',
+    name: 'BBC 6 Minute English',
+    type: 'channel',
+    category: 'learning',
+    defaultLevel: 'A2',
+    titleInclude: '6 minute english',
+    titleExclude: ['box set', 'mega-class'],
+  },
   {
     id: 'PLcetZ6gSk96-FECmH9l7Vlx5VDigvgZpt',
     name: 'BBC 6 Minute English',
@@ -1118,7 +1136,10 @@ function parseYouTubeRss(xmlText: string, source: CuratedFeedSource): FeedVideoI
       const rawTitle = decodeXmlEntities(titleMatch[1].trim());
       const publishedAt = publishedMatch[1].trim();
 
-      if (rawTitle.toLowerCase().includes('#shorts')) continue;
+      const lowerTitle = rawTitle.toLowerCase();
+      if (lowerTitle.includes('#shorts')) continue;
+      if (source.titleInclude && !lowerTitle.includes(source.titleInclude)) continue;
+      if (source.titleExclude?.some((bad) => lowerTitle.includes(bad))) continue;
 
       const durationSec = durationMatch ? parseInt(durationMatch[1], 10) : undefined;
 
@@ -1178,8 +1199,17 @@ async function handleGetCuratedFeed(
   });
 
   const results = await Promise.all(fetchPromises);
+
+  // A video can arrive from several feeds (e.g. the BBC channel and playlist
+  // both carry the latest episode) — keep the first copy of each.
+  const seen = new Set<string>();
   const allItems = results
     .flat()
+    .filter((item) => {
+      if (seen.has(item.videoId)) return false;
+      seen.add(item.videoId);
+      return true;
+    })
     .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
     .slice(0, 24);
 
@@ -1192,7 +1222,9 @@ async function handleGetCuratedFeed(
   const res = new Response(JSON.stringify(responseData), {
     headers: {
       'Content-Type': 'application/json',
-      'Cache-Control': 'public, max-age=300, s-maxage=1800',
+      // Weekly shows, but keep the window short so a new episode shows up the
+      // same day it lands rather than up to half an hour later.
+      'Cache-Control': 'public, max-age=120, s-maxage=600',
       'Access-Control-Allow-Origin': origin,
       'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',

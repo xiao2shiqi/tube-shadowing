@@ -67,7 +67,7 @@ export default function CuratedFeedSection({ onLoadVideo }: CuratedFeedSectionPr
     <div className="w-full max-w-6xl mt-12">
       {/* Dual-Stream Tab Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div className="flex items-center gap-2 p-1 bg-zinc-900/80 border border-zinc-800 rounded-xl">
+        <div className="flex items-center gap-2 p-1 bg-raised border border-line rounded-xl">
           {STREAM_TABS.map((tab) => {
             const isActive = activeTab === tab.key;
             const Icon = tab.icon;
@@ -75,13 +75,13 @@ export default function CuratedFeedSection({ onLoadVideo }: CuratedFeedSectionPr
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-lg transition-all ${
+                className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-md transition-all ${
                   isActive
-                    ? 'bg-zinc-100 text-zinc-950 shadow-md font-semibold'
-                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
+                    ? 'bg-btn text-btn-fg shadow-md font-semibold'
+                    : 'text-ink-soft hover:text-ink hover:bg-hovered'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-zinc-950' : 'text-zinc-400'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-btn-fg' : 'text-ink-soft'}`} />
                 <span>{tab.title}</span>
               </button>
             );
@@ -89,8 +89,8 @@ export default function CuratedFeedSection({ onLoadVideo }: CuratedFeedSectionPr
         </div>
 
         {/* Tab Description Hint */}
-        <div className="text-xs text-zinc-500 flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+        <div className="text-xs text-ink-mute flex items-center gap-1.5">
+          <Sparkles className="w-3.5 h-3.5 text-ink-soft shrink-0" />
           <span>{currentTabInfo.description}</span>
         </div>
       </div>
@@ -101,12 +101,12 @@ export default function CuratedFeedSection({ onLoadVideo }: CuratedFeedSectionPr
           {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
-              className="bg-zinc-900/60 border border-zinc-800 rounded-xl overflow-hidden animate-pulse"
+              className="bg-raised border border-line rounded-xl overflow-hidden animate-pulse"
             >
-              <div className="aspect-video bg-zinc-800" />
+              <div className="aspect-video bg-hovered" />
               <div className="p-3 space-y-2">
-                <div className="h-4 bg-zinc-800 rounded w-3/4" />
-                <div className="h-3 bg-zinc-800 rounded w-1/2" />
+                <div className="h-4 bg-hovered rounded w-3/4" />
+                <div className="h-3 bg-hovered rounded w-1/2" />
               </div>
             </div>
           ))}
@@ -122,7 +122,7 @@ export default function CuratedFeedSection({ onLoadVideo }: CuratedFeedSectionPr
 
       {/* Empty state */}
       {!loading && !error && items.length === 0 && (
-        <div className="py-8 text-center text-sm text-zinc-500 bg-zinc-900/40 border border-zinc-800 rounded-xl">
+        <div className="py-8 text-center text-sm text-ink-mute bg-raised/40 border border-line rounded-xl">
           暂无该专栏下的内容
         </div>
       )}
@@ -134,7 +134,7 @@ export default function CuratedFeedSection({ onLoadVideo }: CuratedFeedSectionPr
             <button
               key={item.videoId || idx}
               onClick={() => onLoadVideo(item.videoId)}
-              className="group text-left bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 rounded-xl overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5"
+              className="group text-left bg-raised border border-line hover:border-line-strong rounded-xl overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5"
             >
               {/* Thumbnail */}
               <div className="relative aspect-video overflow-hidden">
@@ -145,14 +145,14 @@ export default function CuratedFeedSection({ onLoadVideo }: CuratedFeedSectionPr
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <div className="w-10 h-10 rounded-full bg-zinc-100 text-zinc-900 flex items-center justify-center shadow-lg">
+                  <div className="w-10 h-10 rounded-full bg-btn text-btn-fg flex items-center justify-center shadow-lg">
                     <Play className="w-5 h-5 text-zinc-900 fill-zinc-900 ml-0.5" />
                   </div>
                 </div>
 
                 {/* Duration Badge for Learning stream */}
                 {activeTab === 'learning' && (
-                  <span className="absolute bottom-2 right-2 px-1.5 py-0.5 text-[10px] font-medium bg-black/80 text-zinc-200 rounded backdrop-blur-sm flex items-center gap-1">
+                  <span className="absolute bottom-2 right-2 px-1.5 py-0.5 text-[10px] font-medium bg-black/80 text-white rounded backdrop-blur-sm flex items-center gap-1">
                     <Clock className="w-2.5 h-2.5 text-emerald-400" />
                     06:00
                   </span>
@@ -169,11 +169,11 @@ export default function CuratedFeedSection({ onLoadVideo }: CuratedFeedSectionPr
 
               {/* Meta */}
               <div className="p-3">
-                <h3 className="text-sm font-medium text-zinc-200 line-clamp-2 mb-2 group-hover:text-zinc-100 transition-colors">
+                <h3 className="text-sm font-medium text-ink line-clamp-2 mb-2 group-hover:text-ink transition-colors">
                   {item.title}
                 </h3>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs text-zinc-500 truncate">
+                  <span className="text-xs text-ink-mute truncate">
                     {item.channelName}
                   </span>
                   <div className="flex items-center gap-1.5 shrink-0">
@@ -183,13 +183,13 @@ export default function CuratedFeedSection({ onLoadVideo }: CuratedFeedSectionPr
                       </span>
                     )}
                     {activeTab === 'tech' && (
-                      <span className="px-1.5 py-0.5 text-[10px] font-medium bg-zinc-100/10 text-zinc-300 border border-zinc-100/20 rounded">
+                      <span className="px-1.5 py-0.5 text-[10px] font-medium is-active border text-ink-soft rounded">
                         🎙️ 深度访谈
                       </span>
                     )}
                   </div>
                 </div>
-                <div className="mt-1.5 text-[10px] text-zinc-600">
+                <div className="mt-1.5 text-[10px] text-ink-mute">
                   {item.relativeTime}
                 </div>
               </div>
@@ -200,7 +200,7 @@ export default function CuratedFeedSection({ onLoadVideo }: CuratedFeedSectionPr
 
       {/* Loading bottom spinner */}
       {loading && items.length === 0 && (
-        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-zinc-500">
+        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-ink-mute">
           <Loader2 className="w-3.5 h-3.5 animate-spin" />
           正在拉取最新内容...
         </div>

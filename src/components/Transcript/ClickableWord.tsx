@@ -28,8 +28,8 @@ function KaraokeWords({ words }: { words: WordTiming[] }) {
               isCurrentlySpeaking
                 ? 'bg-amber-400 text-zinc-950 font-bold shadow-md scale-105 ring-2 ring-amber-300/50'
                 : isSpoken
-                ? 'text-white font-medium'
-                : 'text-zinc-400 hover:text-zinc-100'
+                ? 'text-ink font-medium'
+                : 'text-ink-soft hover:text-ink'
             }`}
             title="点击在 Mac 欧路词典中查看"
           >
@@ -60,7 +60,7 @@ export default function ClickableWord({
         const isWord = /[a-zA-Z0-9]/.test(token);
         if (!isWord) {
           return (
-            <span key={index} className="text-zinc-500">
+            <span key={index} className="text-ink-mute">
               {token}
             </span>
           );
@@ -73,7 +73,7 @@ export default function ClickableWord({
               e.stopPropagation();
               openInEudic(token);
             }}
-            className="cursor-pointer rounded px-0.5 transition-colors duration-150 hover:bg-zinc-100/15 hover:text-zinc-100 active:bg-zinc-100/25"
+            className="cursor-pointer rounded px-0.5 transition-colors duration-150 hover:bg-hovered hover:text-ink active:bg-hovered"
             title="Click to look up in Eudic"
           >
             {token}

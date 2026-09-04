@@ -36,35 +36,35 @@ export default function AccountSection({ user, onUserUpdate, onToast }: AccountS
           <img
             src={user.picture}
             alt=""
-            className="w-12 h-12 rounded-full border border-zinc-800"
+            className="w-12 h-12 rounded-full border border-line"
           />
         ) : (
-          <div className="w-12 h-12 rounded-full bg-zinc-800 border border-zinc-700" />
+          <div className="w-12 h-12 rounded-full bg-hovered border border-line-strong" />
         )}
         <div className="min-w-0">
-          <div className="text-sm text-zinc-100 truncate">{user.name}</div>
-          <div className="text-xs text-zinc-500 truncate">{user.email}</div>
+          <div className="text-sm text-ink truncate">{user.name}</div>
+          <div className="text-xs text-ink-mute truncate">{user.email}</div>
         </div>
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-zinc-400 mb-1.5">显示名称</label>
+        <label className="block text-xs font-medium text-ink-soft mb-1.5">显示名称</label>
         <input
           type="text"
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
           placeholder={user.name}
           maxLength={60}
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-zinc-500"
+          className="w-full bg-hovered border border-line-strong rounded-md px-3 py-2 text-sm text-ink placeholder-ink-mute outline-none focus:border-line-strong"
         />
-        <p className="mt-1 text-xs text-zinc-600">
+        <p className="mt-1 text-xs text-ink-mute">
           留空则使用登录账号的名称。重新登录不会覆盖你在这里填的名字。
         </p>
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-zinc-400 mb-1.5">登录方式</label>
-        <div className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-zinc-800 border border-zinc-700 text-xs text-zinc-300">
+        <label className="block text-xs font-medium text-ink-soft mb-1.5">登录方式</label>
+        <div className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-hovered border border-line-strong text-xs text-ink-soft">
           {isGithub ? (
             <>
               <Github className="w-3.5 h-3.5" />
@@ -86,7 +86,7 @@ export default function AccountSection({ user, onUserUpdate, onToast }: AccountS
         <button
           onClick={handleSave}
           disabled={!dirty || saving}
-          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-zinc-100 hover:bg-white text-zinc-900 rounded-lg transition-colors disabled:opacity-40 disabled:hover:bg-zinc-100"
+          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium btn-primary rounded-md transition-colors disabled:opacity-40 disabled:hover:bg-btn"
         >
           {saving && <Loader2 className="w-4 h-4 animate-spin" />}
           保存
