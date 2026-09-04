@@ -18,7 +18,9 @@ interface UseAITranslationResult {
 
 export function useAITranslation(
   settings: AISettings,
-  onSentencesUpdate: (updater: (prev: TranscriptSentence[]) => TranscriptSentence[]) => void
+  onSentencesUpdate: (updater: (prev: TranscriptSentence[]) => TranscriptSentence[]) => void,
+  /** Fired only when this user actually translated something (tokens were spent). */
+  onTranslated?: (videoId: string, sentences: TranscriptSentence[]) => void
 ): UseAITranslationResult {
   const [progress, setProgress] = useState<TranslationProgress>({
     total: 0,
@@ -88,6 +90,7 @@ export function useAITranslation(
       await setCachedTranscript(videoId, finalSentences);
       if (resultMap.size > 0) {
         pushCloudTranscriptCache(videoId, finalSentences);
+        onTranslated?.(videoId, finalSentences);
       }
 
       setProgress((p) => ({
@@ -98,7 +101,7 @@ export function useAITranslation(
       }));
       abortRef.current = null;
     },
-    [settings, onSentencesUpdate]
+    [settings, onSentencesUpdate, onTranslated]
   );
 
   const needsTranslation = activeKeyConfig(settings).apiKey.trim().length > 0;

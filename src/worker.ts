@@ -70,9 +70,9 @@ interface GithubUser {
   picture?: string;
 }
 
-type AiProvider = 'deepseek' | 'zhipu' | 'kimi';
+type AiProvider = 'deepseek' | 'zhipu' | 'kimi' | 'mimo';
 
-const AI_PROVIDERS: AiProvider[] = ['deepseek', 'zhipu', 'kimi'];
+const AI_PROVIDERS: AiProvider[] = ['deepseek', 'zhipu', 'kimi', 'mimo'];
 
 interface UserApiKeyRow {
   provider: AiProvider;
@@ -83,6 +83,14 @@ interface UserApiKeyRow {
 
 interface GoogleJwk extends JsonWebKey {
   kid: string;
+}
+
+interface TranslationRecord {
+  videoId: string;
+  title: string;
+  thumbnailUrl: string;
+  sentenceCount: number;
+  translatedAt: number;
 }
 
 interface BookshelfItem {
@@ -253,6 +261,25 @@ async function route(
     const user = await requireAuth(request, env);
     if (!user) return jsonResponse({ error: 'Unauthorized' }, 401, origin);
     return handlePatchMe(request, user, env, origin);
+  }
+
+  if (url.pathname === '/api/translations' && request.method === 'GET') {
+    const user = await requireAuth(request, env);
+    if (!user) return jsonResponse({ error: 'Unauthorized' }, 401, origin);
+    return handleGetTranslations(user.uid, env, origin);
+  }
+
+  if (url.pathname === '/api/translations' && request.method === 'POST') {
+    const user = await requireAuth(request, env);
+    if (!user) return jsonResponse({ error: 'Unauthorized' }, 401, origin);
+    return handlePostTranslation(request, user.uid, env, origin);
+  }
+
+  if (url.pathname.startsWith('/api/translations/') && request.method === 'DELETE') {
+    const user = await requireAuth(request, env);
+    if (!user) return jsonResponse({ error: 'Unauthorized' }, 401, origin);
+    const videoId = decodeURIComponent(url.pathname.slice('/api/translations/'.length));
+    return handleDeleteTranslation(user.uid, videoId, env, origin);
   }
 
   if (url.pathname === '/api/bookshelf' && request.method === 'GET') {
@@ -706,6 +733,98 @@ async function decryptString(encoded: string, key: CryptoKey): Promise<string> {
   const ciphertext = combined.slice(12);
   const plainBuf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
   return new TextDecoder().decode(plainBuf);
+}
+
+// ---------- Translation record handlers ----------
+
+async function handleGetTranslations(
+  userId: number,
+  env: Env,
+  origin: string
+): Promise<Response> {
+  const { results } = await env.DB
+    .prepare(
+      `
+      SELECT video_id, title, thumbnail_url, sentence_count, translated_at
+      FROM user_translations
+      WHERE user_id = ?
+      ORDER BY translated_at DESC
+      `
+    )
+    .bind(userId)
+    .all<Record<string, unknown>>();
+
+  const items: TranslationRecord[] = (results || []).map((row) => ({
+    videoId: String(row.video_id),
+    title: String(row.title),
+    thumbnailUrl: String(row.thumbnail_url),
+    sentenceCount: Number(row.sentence_count),
+    translatedAt: Number(row.translated_at),
+  }));
+
+  return jsonResponse(items, 200, origin);
+}
+
+async function handlePostTranslation(
+  request: Request,
+  userId: number,
+  env: Env,
+  origin: string
+): Promise<Response> {
+  let body: Partial<TranslationRecord>;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ error: 'Invalid JSON body' }, 400, origin);
+  }
+
+  const videoId = body.videoId;
+  if (!videoId || typeof videoId !== 'string') {
+    return jsonResponse({ error: 'Missing videoId' }, 400, origin);
+  }
+
+  // Re-translating the same video refreshes the timestamp rather than duplicating
+  const result = await env.DB
+    .prepare(
+      `
+      INSERT INTO user_translations (user_id, video_id, title, thumbnail_url, sentence_count, translated_at)
+      VALUES (?, ?, ?, ?, ?, unixepoch())
+      ON CONFLICT(user_id, video_id) DO UPDATE SET
+        title = excluded.title,
+        thumbnail_url = excluded.thumbnail_url,
+        sentence_count = excluded.sentence_count,
+        translated_at = excluded.translated_at
+      `
+    )
+    .bind(
+      userId,
+      videoId,
+      body.title ?? '',
+      body.thumbnailUrl ?? '',
+      body.sentenceCount ?? 0
+    )
+    .run();
+
+  if (!result.success) {
+    return jsonResponse({ error: 'Failed to record translation' }, 500, origin);
+  }
+  return jsonResponse({ success: true }, 200, origin);
+}
+
+async function handleDeleteTranslation(
+  userId: number,
+  videoId: string,
+  env: Env,
+  origin: string
+): Promise<Response> {
+  const result = await env.DB
+    .prepare('DELETE FROM user_translations WHERE user_id = ? AND video_id = ?')
+    .bind(userId, videoId)
+    .run();
+  if (!result.success) {
+    return jsonResponse({ error: 'Failed to delete translation record' }, 500, origin);
+  }
+  return jsonResponse({ success: true }, 200, origin);
 }
 
 // ---------- Bookshelf handlers ----------

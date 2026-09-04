@@ -1,4 +1,4 @@
-export type AIProvider = 'deepseek' | 'zhipu' | 'kimi';
+export type AIProvider = 'deepseek' | 'zhipu' | 'kimi' | 'mimo';
 
 export interface AIProviderPreset {
   label: string;
@@ -33,7 +33,7 @@ export const AI_PROVIDER_PRESETS: Record<AIProvider, AIProviderPreset> = {
     keyHint: '前往 open.bigmodel.cn 获取',
   },
   kimi: {
-    label: 'Kimi (Moonshot)',
+    label: 'Kimi',
     baseUrl: 'https://api.moonshot.cn/v1',
     model: 'moonshot-v1-8k',
     models: [
@@ -42,6 +42,17 @@ export const AI_PROVIDER_PRESETS: Record<AIProvider, AIProviderPreset> = {
     ],
     keyUrl: 'https://platform.moonshot.cn/console/api-keys',
     keyHint: '前往 platform.moonshot.cn 获取',
+  },
+  mimo: {
+    label: '小米 MiMo',
+    baseUrl: 'https://api.xiaomimimo.com/v1',
+    model: 'mimo-v2-flash',
+    models: [
+      { value: 'mimo-v2-flash', label: 'mimo-v2-flash (快速)' },
+      { value: 'mimo-v2.5-pro', label: 'mimo-v2.5-pro (效果更强)' },
+    ],
+    keyUrl: 'https://mimo.mi.com',
+    keyHint: '前往 mimo.mi.com 获取，Key 形如 sk- 或 tp-',
   },
 };
 
@@ -69,6 +80,7 @@ export const DEFAULT_AI_SETTINGS: AISettings = {
     deepseek: emptyKeyConfig('deepseek'),
     zhipu: emptyKeyConfig('zhipu'),
     kimi: emptyKeyConfig('kimi'),
+    mimo: emptyKeyConfig('mimo'),
   },
   batchSize: 30,
   concurrency: 3,
@@ -90,6 +102,7 @@ interface LegacyAISettings {
 function providerFromBaseUrl(baseUrl: string): AIProvider {
   if (baseUrl.includes('bigmodel')) return 'zhipu';
   if (baseUrl.includes('moonshot')) return 'kimi';
+  if (baseUrl.includes('xiaomimimo')) return 'mimo';
   return 'deepseek';
 }
 

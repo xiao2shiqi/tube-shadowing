@@ -71,11 +71,11 @@ export default function AITranslationSection({
   return (
     <div className="space-y-4">
       <p className="text-xs text-zinc-500">
-        选中哪家就用哪家翻译字幕。三家的 Key 分别保存，随时切换不用重填。
+        选中哪家就用哪家翻译字幕。各家的 Key 分别保存，随时切换不用重填。
       </p>
 
       {/* Provider tabs */}
-      <div className="flex gap-1">
+      <div className="flex flex-wrap gap-1">
         {PROVIDERS.map((p) => {
           const hasKey = keys[p].apiKey.trim().length > 0;
           return (
@@ -138,17 +138,23 @@ export default function AITranslationSection({
 
       <div>
         <label className="block text-xs font-medium text-zinc-400 mb-1.5">模型</label>
-        <select
+        {/* Free text with suggestions — providers rename models often, so a
+            locked dropdown would go stale and block a working model id. */}
+        <input
+          type="text"
+          list={`models-${activeTab}`}
           value={current.model}
           onChange={(e) => updateCurrent({ model: e.target.value })}
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
-        >
+          placeholder={preset.model}
+          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-zinc-500"
+        />
+        <datalist id={`models-${activeTab}`}>
           {preset.models.map((m) => (
             <option key={m.value} value={m.value}>
               {m.label}
             </option>
           ))}
-        </select>
+        </datalist>
       </div>
 
       {testResult && (

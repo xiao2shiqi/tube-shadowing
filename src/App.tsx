@@ -34,6 +34,12 @@ import {
   deleteServerItem,
 } from './services/bookshelfApi';
 import { fetchServerApiKeys, saveServerApiKey } from './services/userApiKeysApi';
+import type { TranslationRecord } from './types/translation';
+import {
+  fetchTranslationRecords,
+  recordTranslation,
+  deleteTranslationRecord,
+} from './services/translationsApi';
 import { useYouTubePlayer } from './hooks/useYouTubePlayer';
 import { useShadowing } from './hooks/useShadowing';
 import { useLocalStorage } from './hooks/useLocalStorage';
@@ -99,6 +105,7 @@ export default function App() {
   const [googleClientId, setGoogleClientId] = useState<string>('');
   const [githubClientId, setGithubClientId] = useState<string>('');
   const [apiKeysSyncing, setApiKeysSyncing] = useState(false);
+  const [translationRecords, setTranslationRecords] = useState<TranslationRecord[]>([]);
 
   const currentVideoIdRef = useRef<string | null>(null);
   const pendingSeekRef = useRef<number | null>(null);
@@ -180,6 +187,9 @@ export default function App() {
       await Promise.all(toUpload.map((i) => upsertServerItem(i).catch(() => undefined)));
 
       await syncApiKeysFromServer();
+      await fetchTranslationRecords()
+        .then(setTranslationRecords)
+        .catch(() => undefined);
     },
     [mergeBookshelves, showToast, syncApiKeysFromServer]
   );
@@ -206,6 +216,7 @@ export default function App() {
     flushPendingSync().finally(() => {
       clearStoredToken();
       setUser(null);
+      setTranslationRecords([]);
       disableGoogleAutoSelect();
       showToast('已退出登录');
     });
@@ -218,17 +229,14 @@ export default function App() {
     []
   );
 
-  const { progress, startTranslation, cancelTranslation } = useAITranslation(
-    aiSettings,
-    handleSentencesUpdate
-  );
-
   const hasChinese = sentences.some((s) => s.zh);
   const aiKeyConfigured = activeKeyConfig(aiSettings).apiKey.trim().length > 0;
 
   // Refs kept fresh for the 3s progress recorder (avoids stale closures)
   const sentencesRef = useRef(sentences);
   sentencesRef.current = sentences;
+  const userRef = useRef(user);
+  userRef.current = user;
   const currentTimeRef = useRef(currentTime);
   currentTimeRef.current = currentTime;
   const activeIndexRef = useRef(shadowing.activeIndex);
@@ -239,6 +247,35 @@ export default function App() {
     title: '',
     duration: 0,
   });
+
+  // Log the translation against the account. The subtitles themselves already
+  // went to the global shared cache, so this is only "which ones did I translate" —
+  // picking up a translation someone else paid for doesn't get recorded.
+  const handleTranslated = useCallback(
+    (videoId: string, translated: TranscriptSentence[]) => {
+      const record: TranslationRecord = {
+        videoId,
+        title: videoMetaRef.current.title || videoId,
+        thumbnailUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+        sentenceCount: translated.length,
+        translatedAt: Math.floor(Date.now() / 1000),
+      };
+      setTranslationRecords((prev) => [
+        record,
+        ...prev.filter((r) => r.videoId !== videoId),
+      ]);
+      if (userRef.current) {
+        recordTranslation(record).catch(() => undefined);
+      }
+    },
+    []
+  );
+
+  const { progress, startTranslation, cancelTranslation } = useAITranslation(
+    aiSettings,
+    handleSentencesUpdate,
+    handleTranslated
+  );
 
   // Initialize auth, restore session, and merge local/server bookshelf on mount
   useEffect(() => {
@@ -296,6 +333,13 @@ export default function App() {
             setBookshelfItems(merged);
           }
           if (!cancelled) await syncApiKeysFromServer();
+          if (!cancelled) {
+            await fetchTranslationRecords()
+              .then((records) => {
+                if (!cancelled) setTranslationRecords(records);
+              })
+              .catch(() => undefined);
+          }
         } catch {
           clearStoredToken();
           if (!cancelled) {
@@ -465,10 +509,8 @@ export default function App() {
         });
       }
 
-      const needsZh = result.sentences.some((s) => !s.zh);
-      if (needsZh && activeKeyConfig(aiSettings).apiKey.trim()) {
-        startTranslation(videoId, result.sentences);
-      }
+      // Translation is never automatic — opening a video must not spend tokens.
+      // The user starts it from the 「AI 翻译」button below the player.
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load video');
     } finally {
@@ -521,6 +563,17 @@ export default function App() {
         await deleteServerItem(videoId).catch(() => undefined);
       }
       showToast('已从书架移除。全站共享的双语字幕缓存不受影响，下次打开依旧秒开');
+    },
+    [user, showToast]
+  );
+
+  const handleDeleteTranslationRecord = useCallback(
+    async (videoId: string) => {
+      setTranslationRecords((prev) => prev.filter((r) => r.videoId !== videoId));
+      if (user) {
+        await deleteTranslationRecord(videoId).catch(() => undefined);
+      }
+      showToast('已删除翻译记录，全站共享的双语字幕不受影响');
     },
     [user, showToast]
   );
@@ -583,10 +636,10 @@ export default function App() {
         .finally(() => setApiKeysSyncing(false));
     }
 
+    // Saving a key does not kick off a translation either — same rule as above.
     const pendingZh = currentVideoIdRef.current && sentences.some((s) => !s.zh);
-    if (active.apiKey.trim() && pendingZh && currentVideoIdRef.current) {
-      showToast('AI 翻译已启动，正在后台进行...');
-      startTranslation(currentVideoIdRef.current, sentences);
+    if (active.apiKey.trim() && pendingZh) {
+      showToast('已保存，点击播放器下方的「AI 翻译」开始翻译');
     }
   };
 
@@ -724,15 +777,28 @@ export default function App() {
             </div>
           )}
 
-          {/* No Chinese & no key: guide to configure */}
-          {!hasChinese && !aiKeyConfigured && sentences.length > 0 && (
-            <button
-              onClick={() => setSettingsSection('ai')}
-              className="mt-3 flex items-center gap-2 px-4 py-2.5 bg-zinc-100/10 hover:bg-zinc-100/15 border border-zinc-100/25 text-zinc-100 rounded-lg text-sm transition-colors"
-            >
-              <Sparkles className="w-4 h-4" />
-              配置 DeepSeek 一键翻译双语
-            </button>
+          {/* Missing Chinese: translating is always an explicit click, never automatic */}
+          {!hasChinese && sentences.length > 0 && progress.status !== 'translating' && (
+            aiKeyConfigured ? (
+              <button
+                onClick={() =>
+                  currentVideoIdRef.current &&
+                  startTranslation(currentVideoIdRef.current, sentences)
+                }
+                className="mt-3 flex items-center gap-2 px-4 py-2.5 bg-zinc-100 hover:bg-white text-zinc-900 rounded-lg text-sm font-medium transition-colors"
+              >
+                <Sparkles className="w-4 h-4" />
+                AI 翻译这个视频（{sentences.length} 句）
+              </button>
+            ) : (
+              <button
+                onClick={() => setSettingsSection('ai')}
+                className="mt-3 flex items-center gap-2 px-4 py-2.5 bg-zinc-100/10 hover:bg-zinc-100/15 border border-zinc-100/25 text-zinc-100 rounded-lg text-sm transition-colors"
+              >
+                <Sparkles className="w-4 h-4" />
+                配置 AI 翻译
+              </button>
+            )
           )}
 
           {error && (
@@ -841,9 +907,11 @@ export default function App() {
       {showBookshelf && (
         <BookshelfModal
           items={bookshelfItems}
+          translations={translationRecords}
           currentVideoId={currentVideoIdRef.current || undefined}
           onSelectVideo={(videoId, resumeTime) => handleLoadVideo(videoId, resumeTime)}
           onDeleteItem={handleDeleteBookshelfItem}
+          onDeleteTranslation={handleDeleteTranslationRecord}
           onClose={() => setShowBookshelf(false)}
         />
       )}
