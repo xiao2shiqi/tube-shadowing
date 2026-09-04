@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Search, Clock, Keyboard, ChevronDown, Sparkles, BookOpen, LogOut, Github } from 'lucide-react';
+import { Search, Clock, Keyboard, ChevronDown, Sparkles, BookOpen, LogOut, Github, Settings } from 'lucide-react';
 import type { User } from '../services/authService';
-import { renderGoogleButton } from '../services/authService';
+import { renderGoogleButton, userLabel } from '../services/authService';
 import { DEMO_VIDEOS } from '../constants/demoVideos';
 
 interface HeaderProps {
@@ -9,6 +9,7 @@ interface HeaderProps {
   history: string[];
   onShowShortcuts: () => void;
   onShowAISettings: () => void;
+  onShowSettings: () => void;
   aiKeyConfigured: boolean;
   onShowBookshelf: () => void;
   bookshelfCount: number;
@@ -27,6 +28,7 @@ export default function Header({
   history,
   onShowShortcuts,
   onShowAISettings,
+  onShowSettings,
   aiKeyConfigured,
   onShowBookshelf,
   bookshelfCount,
@@ -41,7 +43,9 @@ export default function Header({
 }: HeaderProps) {
   const [input, setInput] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Called when the Google button div mounts — initialize() is already done at this point
   const googleBtnRef = useCallback((el: HTMLDivElement | null) => {
@@ -52,6 +56,9 @@ export default function Header({
     const handler = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setShowDropdown(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setShowUserMenu(false);
       }
     };
     document.addEventListener('mousedown', handler);
@@ -74,15 +81,24 @@ export default function Header({
 
   return (
     <header className="flex items-center gap-3 px-4 py-2 bg-zinc-900 border-b border-zinc-800 shrink-0">
-      <h1 className="text-amber-400 font-bold text-lg whitespace-nowrap hidden sm:block">
-        Tube Shadowing
+      <h1 className="whitespace-nowrap hidden sm:block">
+        <a
+          href="https://xiao27.com"
+          className="group flex items-baseline gap-1.5 text-zinc-300 hover:text-zinc-100 transition-colors"
+          title="返回 phoenix hub"
+        >
+          <span className="font-bold text-lg">Tube Shadowing</span>
+          <span className="text-[11px] font-mono text-zinc-600 group-hover:text-zinc-400 transition-colors">
+            / xiao27
+          </span>
+        </a>
       </h1>
 
       {hideSearch && <div className="flex-1" />}
 
       {!hideSearch && <div className="flex-1 relative" ref={dropdownRef}>
         <form onSubmit={handleSubmit}>
-          <div className="flex items-center bg-zinc-800 rounded-lg border border-zinc-700 focus-within:border-amber-500/50 transition-colors">
+          <div className="flex items-center bg-zinc-800 rounded-lg border border-zinc-700 focus-within:border-zinc-500 transition-colors">
           <Search className="w-4 h-4 text-zinc-400 ml-3 shrink-0" />
           <input
             type="text"
@@ -94,7 +110,7 @@ export default function Header({
           />
           <button
             type="submit"
-            className="px-4 py-1.5 mr-1.5 text-sm font-medium bg-amber-500 hover:bg-amber-400 text-zinc-900 rounded-md transition-colors"
+            className="px-4 py-1.5 mr-1.5 text-sm font-medium bg-zinc-100 hover:bg-white text-zinc-900 rounded-md transition-colors"
           >
             Load
           </button>
@@ -144,10 +160,10 @@ export default function Header({
         className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-zinc-300 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-lg transition-colors shrink-0"
         title="我的精读书架"
       >
-        <BookOpen className="w-4 h-4 text-amber-400" />
+        <BookOpen className="w-4 h-4 text-zinc-300" />
         <span className="hidden sm:inline">书架</span>
         {bookshelfCount > 0 && (
-          <span className="px-1.5 py-0.5 text-xs font-medium bg-amber-500/20 text-amber-400 rounded-full">
+          <span className="px-1.5 py-0.5 text-xs font-medium bg-zinc-100/10 text-zinc-300 rounded-full">
             {bookshelfCount}
           </span>
         )}
@@ -158,7 +174,7 @@ export default function Header({
         className={`relative p-2 transition-colors ${
           aiKeyConfigured
             ? 'text-emerald-400 hover:text-emerald-300'
-            : 'text-zinc-400 hover:text-amber-400'
+            : 'text-zinc-400 hover:text-zinc-100'
         }`}
         title={aiKeyConfigured ? 'DeepSeek AI 已配置' : '配置 DeepSeek AI 翻译'}
       >
@@ -170,7 +186,7 @@ export default function Header({
 
       <button
         onClick={onShowShortcuts}
-        className="p-2 text-zinc-400 hover:text-amber-400 transition-colors"
+        className="p-2 text-zinc-400 hover:text-zinc-100 transition-colors"
         title="Keyboard shortcuts"
       >
         <Keyboard className="w-5 h-5" />
@@ -179,27 +195,58 @@ export default function Header({
       {/* Auth section */}
       <div className="flex items-center gap-2 shrink-0 pl-2 border-l border-zinc-800">
         {authLoading ? (
-          <div className="w-5 h-5 border-2 border-zinc-600 border-t-amber-400 rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-zinc-600 border-t-zinc-100 rounded-full animate-spin" />
         ) : user ? (
-          <>
-            {user.picture && (
-              <img
-                src={user.picture}
-                alt={user.name || user.email}
-                className="w-7 h-7 rounded-full border border-zinc-700"
-              />
-            )}
-            <span className="hidden md:block text-sm text-zinc-300 max-w-[120px] truncate">
-              {user.name || user.email}
-            </span>
+          <div className="relative" ref={userMenuRef}>
             <button
-              onClick={onLogout}
-              className="p-2 text-zinc-400 hover:text-red-400 transition-colors"
-              title="退出登录"
+              onClick={() => setShowUserMenu((v) => !v)}
+              className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full hover:bg-zinc-800 transition-colors"
+              title="账号与设置"
             >
-              <LogOut className="w-4 h-4" />
+              {user.picture ? (
+                <img
+                  src={user.picture}
+                  alt=""
+                  className="w-7 h-7 rounded-full border border-zinc-700"
+                />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-zinc-800 border border-zinc-700" />
+              )}
+              <span className="hidden md:block text-sm text-zinc-300 max-w-[120px] truncate">
+                {userLabel(user)}
+              </span>
+              <ChevronDown className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
             </button>
-          </>
+
+            {showUserMenu && (
+              <div className="absolute top-full right-0 mt-1.5 w-52 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-50 overflow-hidden">
+                <div className="px-3 py-2.5 border-b border-zinc-800">
+                  <div className="text-sm text-zinc-200 truncate">{userLabel(user)}</div>
+                  <div className="text-xs text-zinc-500 truncate">{user.email}</div>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    onShowSettings();
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 transition-colors"
+                >
+                  <Settings className="w-4 h-4" />
+                  个人设置
+                </button>
+                <button
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    onLogout();
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:bg-zinc-800 hover:text-red-400 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  退出登录
+                </button>
+              </div>
+            )}
+          </div>
         ) : (
           <>
             {googleReady && googleClientId && <div ref={googleBtnRef} />}

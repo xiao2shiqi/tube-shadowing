@@ -171,7 +171,7 @@ export default {
 function corsHeaders(origin: string): Record<string, string> {
   return {
     'Access-Control-Allow-Origin': origin,
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
 }
@@ -182,7 +182,7 @@ function jsonResponse(body: unknown, status = 200, origin = '*'): Response {
     headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': origin,
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
   });
@@ -235,11 +235,24 @@ async function route(
   if (url.pathname === '/api/me' && request.method === 'GET') {
     const user = await requireAuth(request, env);
     if (!user) return jsonResponse({ error: 'Unauthorized' }, 401, origin);
+    const displayName = await readDisplayName(env.DB, user.uid);
     return jsonResponse(
-      { sub: user.sub, email: user.email, name: user.name, picture: user.picture },
+      {
+        sub: user.sub,
+        email: user.email,
+        name: user.name,
+        picture: user.picture,
+        displayName,
+      },
       200,
       origin
     );
+  }
+
+  if (url.pathname === '/api/me' && request.method === 'PATCH') {
+    const user = await requireAuth(request, env);
+    if (!user) return jsonResponse({ error: 'Unauthorized' }, 401, origin);
+    return handlePatchMe(request, user, env, origin);
   }
 
   if (url.pathname === '/api/bookshelf' && request.method === 'GET') {
@@ -330,6 +343,7 @@ async function handleAuthGoogle(
         email: googleUser.email,
         name: googleUser.name || googleUser.email,
         picture: googleUser.picture || '',
+        displayName: await readDisplayName(env.DB, userId),
       },
     },
     200,
@@ -394,6 +408,7 @@ async function handleAuthGithub(
         email: githubUser.email,
         name: githubUser.name || githubUser.login,
         picture: githubUser.picture || '',
+        displayName: await readDisplayName(env.DB, userId),
       },
     },
     200,
@@ -514,6 +529,67 @@ async function requireAuth(request: Request, env: Env): Promise<JwtPayload | nul
   if (!auth || !auth.startsWith('Bearer ')) return null;
   const token = auth.slice(7);
   return verifyJwt(token, env.JWT_SECRET);
+}
+
+// ---------- Profile handlers ----------
+
+async function readDisplayName(db: D1Database, userId: number): Promise<string> {
+  const row = await db
+    .prepare('SELECT display_name FROM users WHERE id = ?')
+    .bind(userId)
+    .first<{ display_name: string | null }>();
+  return row?.display_name || '';
+}
+
+async function handlePatchMe(
+  request: Request,
+  user: JwtPayload,
+  env: Env,
+  origin: string
+): Promise<Response> {
+  let body: { displayName?: string };
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ error: 'Invalid JSON body' }, 400, origin);
+  }
+
+  if (typeof body.displayName !== 'string') {
+    return jsonResponse({ error: 'Missing displayName' }, 400, origin);
+  }
+
+  const displayName = body.displayName.trim().slice(0, 60);
+  const result = await env.DB
+    .prepare('UPDATE users SET display_name = ?, updated_at = unixepoch() WHERE id = ?')
+    .bind(displayName || null, user.uid)
+    .run();
+
+  if (!result.success) {
+    return jsonResponse({ error: 'Failed to save profile' }, 500, origin);
+  }
+
+  // Read back rather than echoing the input, so the response can't report a
+  // save that didn't land (e.g. the row is gone and the UPDATE matched nothing).
+  const stored = await env.DB
+    .prepare('SELECT display_name FROM users WHERE id = ?')
+    .bind(user.uid)
+    .first<{ display_name: string | null }>();
+
+  if (!stored) {
+    return jsonResponse({ error: 'User not found' }, 404, origin);
+  }
+
+  return jsonResponse(
+    {
+      sub: user.sub,
+      email: user.email,
+      name: user.name,
+      picture: user.picture,
+      displayName: stored.display_name || '',
+    },
+    200,
+    origin
+  );
 }
 
 // ---------- User AI API key handlers ----------
@@ -999,7 +1075,7 @@ async function handleGetCuratedFeed(
       'Content-Type': 'application/json',
       'Cache-Control': 'public, max-age=300, s-maxage=1800',
       'Access-Control-Allow-Origin': origin,
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
   });

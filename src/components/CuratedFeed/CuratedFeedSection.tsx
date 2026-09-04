@@ -90,7 +90,7 @@ export default function CuratedFeedSection({ onLoadVideo }: CuratedFeedSectionPr
 
         {/* Tab Description Hint */}
         <div className="text-xs text-zinc-500 flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-amber-400/80 shrink-0" />
+          <Sparkles className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
           <span>{currentTabInfo.description}</span>
         </div>
       </div>
@@ -145,7 +145,7 @@ export default function CuratedFeedSection({ onLoadVideo }: CuratedFeedSectionPr
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center shadow-lg">
+                  <div className="w-10 h-10 rounded-full bg-zinc-100 text-zinc-900 flex items-center justify-center shadow-lg">
                     <Play className="w-5 h-5 text-zinc-900 fill-zinc-900 ml-0.5" />
                   </div>
                 </div>
@@ -169,7 +169,7 @@ export default function CuratedFeedSection({ onLoadVideo }: CuratedFeedSectionPr
 
               {/* Meta */}
               <div className="p-3">
-                <h3 className="text-sm font-medium text-zinc-200 line-clamp-2 mb-2 group-hover:text-amber-400 transition-colors">
+                <h3 className="text-sm font-medium text-zinc-200 line-clamp-2 mb-2 group-hover:text-zinc-100 transition-colors">
                   {item.title}
                 </h3>
                 <div className="flex items-center justify-between gap-2">
@@ -183,7 +183,7 @@ export default function CuratedFeedSection({ onLoadVideo }: CuratedFeedSectionPr
                       </span>
                     )}
                     {activeTab === 'tech' && (
-                      <span className="px-1.5 py-0.5 text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded">
+                      <span className="px-1.5 py-0.5 text-[10px] font-medium bg-zinc-100/10 text-zinc-300 border border-zinc-100/20 rounded">
                         🎙️ 深度访谈
                       </span>
                     )}

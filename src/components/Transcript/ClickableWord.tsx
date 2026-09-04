@@ -29,7 +29,7 @@ function KaraokeWords({ words }: { words: WordTiming[] }) {
                 ? 'bg-amber-400 text-zinc-950 font-bold shadow-md scale-105 ring-2 ring-amber-300/50'
                 : isSpoken
                 ? 'text-white font-medium'
-                : 'text-zinc-400 hover:text-amber-300'
+                : 'text-zinc-400 hover:text-zinc-100'
             }`}
             title="点击在 Mac 欧路词典中查看"
           >
@@ -73,7 +73,7 @@ export default function ClickableWord({
               e.stopPropagation();
               openInEudic(token);
             }}
-            className="cursor-pointer rounded px-0.5 transition-colors duration-150 hover:bg-amber-400/20 hover:text-amber-300 active:bg-amber-400/40"
+            className="cursor-pointer rounded px-0.5 transition-colors duration-150 hover:bg-zinc-100/15 hover:text-zinc-100 active:bg-zinc-100/25"
             title="Click to look up in Eudic"
           >
             {token}

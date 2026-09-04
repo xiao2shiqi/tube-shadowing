@@ -26,6 +26,7 @@ import {
   consumeGithubCallback,
   exchangeGithubCode,
   startGithubLogin,
+  userLabel,
 } from './services/authService';
 import {
   fetchServerBookshelf,
@@ -42,7 +43,8 @@ import YouTubePlayer from './components/Player/YouTubePlayer';
 import ShadowingControls from './components/Player/ShadowingControls';
 import TranscriptList from './components/Transcript/TranscriptList';
 import KeyboardShortcutsModal from './components/Common/KeyboardShortcutsModal';
-import AISettingsModal from './components/Settings/AISettingsModal';
+import SettingsModal from './components/Settings/SettingsModal';
+import type { SettingsSectionId } from './components/Settings/SettingsModal';
 import BookshelfModal from './components/Bookshelf/BookshelfModal';
 import Toast from './components/Common/Toast';
 import HeroSection from './components/HeroSection';
@@ -63,7 +65,8 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showShortcuts, setShowShortcuts] = useState(false);
-  const [showAISettings, setShowAISettings] = useState(false);
+  // null = closed; otherwise the section 个人设置 opens on
+  const [settingsSection, setSettingsSection] = useState<SettingsSectionId | null>(null);
   const [showBookshelf, setShowBookshelf] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [history, setHistory] = useLocalStorage<string[]>('tube-shadowing-history', []);
@@ -162,7 +165,7 @@ export default function App() {
       setStoredToken(token);
       setUser(u);
       setAuthLoading(false);
-      showToast(`欢迎，${u.name || u.email}`);
+      showToast(`欢迎，${userLabel(u)}`);
 
       const local = await getBookshelfItems();
       const server = await fetchServerBookshelf();
@@ -626,7 +629,8 @@ export default function App() {
         onLoadVideo={(input) => handleLoadVideo(input)}
         history={history}
         onShowShortcuts={() => setShowShortcuts(true)}
-        onShowAISettings={() => setShowAISettings(true)}
+        onShowAISettings={() => setSettingsSection('ai')}
+        onShowSettings={() => setSettingsSection('account')}
         aiKeyConfigured={aiKeyConfigured}
         onShowBookshelf={() => setShowBookshelf(true)}
         bookshelfCount={bookshelfItems.length}
@@ -679,7 +683,7 @@ export default function App() {
                 onClick={() => shadowing.setSubtitleMode(mode)}
                 className={`px-3 py-1 text-xs rounded-full transition-colors ${
                   shadowing.subtitleMode === mode
-                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                    ? 'bg-zinc-100/10 text-zinc-100 border border-zinc-100/25'
                     : 'bg-zinc-800 text-zinc-500 border border-zinc-700 hover:text-zinc-300'
                 }`}
               >
@@ -690,8 +694,8 @@ export default function App() {
 
           {/* Translation progress bar */}
           {progress.status === 'translating' && (
-            <div className="mt-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-              <div className="flex items-center justify-between text-xs text-amber-400 mb-2">
+            <div className="mt-3 p-3 bg-zinc-100/5 border border-zinc-100/15 rounded-lg">
+              <div className="flex items-center justify-between text-xs text-zinc-300 mb-2">
                 <span className="flex items-center gap-1.5">
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   DeepSeek AI 智能精翻中... {percent}% ({progress.completed}/
@@ -699,7 +703,7 @@ export default function App() {
                 </span>
                 <button
                   onClick={cancelTranslation}
-                  className="p-0.5 text-amber-400/60 hover:text-amber-300"
+                  className="p-0.5 text-zinc-500 hover:text-zinc-100"
                   title="中断翻译"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -707,7 +711,7 @@ export default function App() {
               </div>
               <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-amber-500 to-amber-300 rounded-full transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-zinc-400 to-zinc-100 rounded-full transition-all duration-500"
                   style={{ width: `${percent}%` }}
                 />
               </div>
@@ -723,8 +727,8 @@ export default function App() {
           {/* No Chinese & no key: guide to configure */}
           {!hasChinese && !aiKeyConfigured && sentences.length > 0 && (
             <button
-              onClick={() => setShowAISettings(true)}
-              className="mt-3 flex items-center gap-2 px-4 py-2.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-400 rounded-lg text-sm transition-colors"
+              onClick={() => setSettingsSection('ai')}
+              className="mt-3 flex items-center gap-2 px-4 py-2.5 bg-zinc-100/10 hover:bg-zinc-100/15 border border-zinc-100/25 text-zinc-100 rounded-lg text-sm transition-colors"
             >
               <Sparkles className="w-4 h-4" />
               配置 DeepSeek 一键翻译双语
@@ -739,7 +743,7 @@ export default function App() {
 
           {loading && (
             <div className="mt-3 flex items-center gap-2 text-sm text-zinc-400">
-              <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-zinc-100 border-t-transparent rounded-full animate-spin" />
               Loading subtitles...
             </div>
           )}
@@ -750,8 +754,8 @@ export default function App() {
               onClick={handleToggleBookshelf}
               className={`mt-4 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border transition-colors ${
                 isBookshelved
-                  ? 'bg-amber-500/15 text-amber-400 border-amber-500/40 hover:bg-amber-500/25'
-                  : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:text-amber-400 hover:border-amber-500/40'
+                  ? 'bg-zinc-100/10 text-zinc-100 border-zinc-100/25 hover:bg-zinc-100/15'
+                  : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:text-zinc-100 hover:border-zinc-100/30'
               }`}
             >
               {isBookshelved ? (
@@ -774,12 +778,12 @@ export default function App() {
           onMouseDown={startDrag}
           onDoubleClick={() => setLeftWidth(50)}
           className={`hidden lg:block w-1.5 shrink-0 cursor-col-resize transition-colors relative group ${
-            isDragging ? 'bg-amber-500' : 'bg-zinc-800 hover:bg-amber-500/60'
+            isDragging ? 'bg-zinc-100' : 'bg-zinc-800 hover:bg-zinc-100/50'
           }`}
           title="拖动调整面板宽度，双击复位"
         >
           <div className="absolute inset-y-0 -left-2 -right-2" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-8 rounded-full bg-zinc-600 group-hover:bg-amber-400/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-8 rounded-full bg-zinc-600 group-hover:bg-zinc-100/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
             <div className="w-0.5 h-3.5 bg-zinc-900 rounded-full" />
           </div>
         </div>
@@ -794,7 +798,7 @@ export default function App() {
               )}
             </h2>
             {progress.status === 'translating' && (
-              <span className="ml-auto text-xs text-amber-400/80">
+              <span className="ml-auto text-xs text-zinc-400">
                 ✨ {percent}%
               </span>
             )}
@@ -821,13 +825,16 @@ export default function App() {
         <KeyboardShortcutsModal onClose={() => setShowShortcuts(false)} />
       )}
 
-      {showAISettings && (
-        <AISettingsModal
-          settings={aiSettings}
-          syncing={apiKeysSyncing}
-          syncEnabled={!!user}
-          onSave={handleSaveAISettings}
-          onClose={() => setShowAISettings(false)}
+      {settingsSection && (
+        <SettingsModal
+          user={user}
+          aiSettings={aiSettings}
+          apiKeysSyncing={apiKeysSyncing}
+          initialSection={settingsSection}
+          onSaveAISettings={handleSaveAISettings}
+          onUserUpdate={setUser}
+          onToast={showToast}
+          onClose={() => setSettingsSection(null)}
         />
       )}
 

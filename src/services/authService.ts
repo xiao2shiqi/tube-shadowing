@@ -3,6 +3,13 @@ export interface User {
   email: string;
   name: string;
   picture: string;
+  /** Name the user set themselves in 个人设置; falls back to the OAuth `name`. */
+  displayName?: string;
+}
+
+/** What to show for a user anywhere in the UI. */
+export function userLabel(user: User): string {
+  return user.displayName?.trim() || user.name || user.email;
 }
 
 interface GoogleCredentialResponse {
@@ -132,6 +139,20 @@ export async function fetchCurrentUser(token: string): Promise<User> {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error('Session expired');
+  return res.json();
+}
+
+export async function updateProfile(displayName: string): Promise<User> {
+  const token = getStoredToken();
+  const res = await fetch('/api/me', {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ displayName }),
+  });
+  if (!res.ok) throw new Error('保存失败');
   return res.json();
 }
 

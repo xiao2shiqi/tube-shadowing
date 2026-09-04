@@ -23,7 +23,7 @@ export default function ShadowingControls({
         onClick={onToggleLoop}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
           isLooping
-            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+            ? 'bg-zinc-100/10 text-zinc-100 border border-zinc-100/25'
             : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:text-zinc-200'
         }`}
         title="A-B Loop (L)"
@@ -36,7 +36,7 @@ export default function ShadowingControls({
         onClick={onToggleAutoPause}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
           isAutoPause
-            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+            ? 'bg-zinc-100/10 text-zinc-100 border border-zinc-100/25'
             : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:text-zinc-200'
         }`}
         title="Auto-pause at sentence end (P)"
@@ -54,7 +54,7 @@ export default function ShadowingControls({
         >
           -
         </button>
-        <span className="px-2 py-1 text-sm font-mono text-amber-400 min-w-[3rem] text-center">
+        <span className="px-2 py-1 text-sm font-mono text-zinc-300 min-w-[3rem] text-center">
           {playbackRate.toFixed(1)}x
         </span>
         <button

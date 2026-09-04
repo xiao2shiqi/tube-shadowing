@@ -41,7 +41,7 @@ export default function HeroSection({ onLoadVideo, history }: HeroSectionProps) 
       <div className="flex-1 flex flex-col items-center justify-center w-full min-h-[60vh]">
         {/* Logo & tagline */}
         <div className="mb-10 text-center">
-          <h1 className="text-5xl font-bold text-amber-400 mb-4 tracking-tight">
+          <h1 className="text-5xl font-bold text-zinc-300 mb-4 tracking-tight">
             Tube Shadowing
           </h1>
           <p className="text-zinc-400 text-lg max-w-md">
@@ -52,7 +52,7 @@ export default function HeroSection({ onLoadVideo, history }: HeroSectionProps) 
       {/* Search input */}
       <div className="w-full max-w-xl relative" ref={dropdownRef}>
         <form onSubmit={handleSubmit}>
-          <div className="flex items-center bg-zinc-800 rounded-xl border border-zinc-700 focus-within:border-amber-500/60 transition-colors shadow-xl">
+          <div className="flex items-center bg-zinc-800 rounded-xl border border-zinc-700 focus-within:border-zinc-500 transition-colors shadow-xl">
             <Search className="w-5 h-5 text-zinc-400 ml-4 shrink-0" />
             <input
               type="text"
@@ -65,7 +65,7 @@ export default function HeroSection({ onLoadVideo, history }: HeroSectionProps) 
             />
             <button
               type="submit"
-              className="px-5 py-2.5 mr-2 text-sm font-semibold bg-amber-500 hover:bg-amber-400 text-zinc-900 rounded-lg transition-colors"
+              className="px-5 py-2.5 mr-2 text-sm font-semibold bg-zinc-100 hover:bg-white text-zinc-900 rounded-lg transition-colors"
             >
               Load
             </button>
@@ -113,19 +113,19 @@ export default function HeroSection({ onLoadVideo, history }: HeroSectionProps) 
         {/* Feature hints */}
         <div className="mt-10 flex flex-wrap justify-center items-center gap-6 text-sm text-zinc-500">
           <span className="flex items-center gap-1.5">
-            <Play className="w-3.5 h-3.5 text-amber-500/70" />
+            <Play className="w-3.5 h-3.5 text-zinc-500" />
             Word-level karaoke
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="text-amber-500/70">↻</span>
+            <span className="text-zinc-500">↻</span>
             Loop &amp; shadow
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="text-amber-500/70">✦</span>
+            <span className="text-zinc-500">✦</span>
             AI bilingual subtitles
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="text-amber-500/70">◈</span>
+            <span className="text-zinc-500">◈</span>
             Cross-device bookshelf
           </span>
         </div>

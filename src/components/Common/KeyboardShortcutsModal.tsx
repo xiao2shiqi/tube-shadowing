@@ -38,7 +38,7 @@ export default function KeyboardShortcutsModal({ onClose }: KeyboardShortcutsMod
           {SHORTCUTS.map(({ key, desc }) => (
             <div key={key} className="flex items-center justify-between py-1">
               <span className="text-sm text-zinc-400">{desc}</span>
-              <kbd className="px-2 py-0.5 text-xs font-mono bg-zinc-800 text-amber-400 border border-zinc-600 rounded">
+              <kbd className="px-2 py-0.5 text-xs font-mono bg-zinc-800 text-zinc-300 border border-zinc-600 rounded">
                 {key}
               </kbd>
             </div>
