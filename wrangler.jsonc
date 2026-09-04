@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "tube-shadowing",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-08-20",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS"
+  },
+  "routes": [
+    { "pattern": "shadowing.xiao27.com", "custom_domain": true }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tube-shadowing-db",
+      "database_id": "576085e8-4621-40f1-be43-5e0789df1381"
+    }
+  ]
+}
